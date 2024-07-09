@@ -1,14 +1,21 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, abort
 import markdown2
 import os
+import chardet
 
 app = Flask(__name__)
 
 # Function to read and convert markdown files to HTML
 def read_markdown_file(file_path):
-    with open(file_path, 'r', encoding='utf-8', errors='ignore') as file:
+    with open(file_path, 'rb') as file:
+        raw_data = file.read()
+        result = chardet.detect(raw_data)
+        encoding = result['encoding']
+    
+    with open(file_path, 'r', encoding=encoding, errors='ignore') as file:
         content = file.read()
     return markdown2.markdown(content)
+
 # Route to list all books
 @app.route('/')
 def index():
